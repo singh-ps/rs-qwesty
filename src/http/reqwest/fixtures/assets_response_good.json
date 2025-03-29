@@ -1,0 +1,28 @@
+{
+    "assets": [
+        {
+            "url": "http://192.168.2.212:8080/materials",
+            "hash": "1df62b7a3e3062c74b4eb4e7b1937674",
+            "name": "materials",
+            "version": "1.0.0"
+        },
+        {
+            "url": "http://192.168.2.212:8080/cube",
+            "hash": "8ab6dd5fb32cd0f50506c5f12800e6db",
+            "name": "cube",
+            "version": "1.0.0"
+        },
+        {
+            "url": "http://192.168.2.212:8080/sphere",
+            "hash": "41392e64f653484f2eae33803b927691",
+            "name": "sphere",
+            "version": "2.0.0"
+        },
+        {
+            "url": "http://192.168.2.212:8080/cylinder",
+            "hash": "95e3cdd4d63156aa9508afd588f490f0",
+            "name": "cylinder",
+            "version": "1.0.0"
+        }
+    ]
+}

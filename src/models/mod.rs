@@ -20,7 +20,7 @@ pub struct ErrorMessage {
 
 use thiserror::Error;
 
-#[derive(Error, Clone, Debug, serde::Deserialize)]
+#[derive(Error, Clone, Debug, serde::Deserialize, PartialEq)]
 pub enum HttpError {
     #[error("Request failed: `{0}`")]
     RequestFailed(String),
