@@ -78,7 +78,10 @@ mod tests {
         let deserialization_result = response.unwrap().deserialize::<Assets>().await;
         assert!(deserialization_result.is_err());
         // The exact error message may vary, so just check it's a DeSerError
-        matches!(deserialization_result.err().unwrap(), HttpError::DeSerError(_));
+        matches!(
+            deserialization_result.err().unwrap(),
+            HttpError::DeSerError(_)
+        );
     }
 
     #[tokio::test]
@@ -101,6 +104,9 @@ mod tests {
         let deserialization_result = response.unwrap().deserialize::<Assets>().await;
         assert!(deserialization_result.is_err());
         // Should be a RequestFailed error because the status is not success
-        matches!(deserialization_result.err().unwrap(), HttpError::RequestFailed(_));
+        matches!(
+            deserialization_result.err().unwrap(),
+            HttpError::RequestFailed(_)
+        );
     }
 }
