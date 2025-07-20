@@ -1,5 +1,7 @@
-use crate::http::reqwest::{get_client, handle_response};
-use crate::models::HttpError;
+use crate::{
+    http::reqwest::{get_client, handle_response},
+    models::HttpError,
+};
 use serde::de::DeserializeOwned;
 
 pub async fn get<T>(url: &str) -> Result<T, HttpError>
