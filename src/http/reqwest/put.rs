@@ -57,7 +57,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
 
         let request_body = UpdateAssetRequest {
             name: "test-asset".to_string(),
@@ -83,7 +83,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
 
         let request_body = UpdateAssetRequest {
             name: "test-asset".to_string(),
@@ -115,7 +115,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
 
         let request_body = UpdateAssetRequest {
             name: "test-asset".to_string(),

@@ -50,7 +50,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
         let response = get(url.as_str()).await;
 
         mock.assert_async().await;
@@ -70,7 +70,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
         let response = get(url.as_str()).await;
 
         mock.assert_async().await;
@@ -96,7 +96,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
         let response = get(url.as_str()).await;
 
         mock.assert_async().await;

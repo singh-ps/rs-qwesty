@@ -20,9 +20,9 @@ mod tests {
     use super::delete;
     use crate::models::HttpError;
     use mockito::Server;
-    use serde::{Deserialize, Serialize};
+    use serde::Deserialize;
 
-// Removed the unused DeleteRequest struct as it was not utilized in the code.
+    // Removed the unused DeleteRequest struct as it was not utilized in the code.
 
     #[derive(Deserialize, Debug)]
     #[allow(dead_code)]
@@ -43,7 +43,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint/1", server_url);
+        let url = format!("{server_url}/endpoint/1");
 
         let response = delete(url.as_str()).await;
 
@@ -69,7 +69,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint/999", server_url);
+        let url = format!("{server_url}/endpoint/999");
 
         let response = delete(url.as_str()).await;
 

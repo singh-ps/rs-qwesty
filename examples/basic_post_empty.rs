@@ -32,7 +32,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("No data was sent (empty body): '{}'", data.data);
         println!("JSON field is null: {}", data.json);
     } else {
-        println!("Empty POST request failed with status: {}", response.status());
+        println!(
+            "Empty POST request failed with status: {}",
+            response.status()
+        );
     }
 
     Ok(())
