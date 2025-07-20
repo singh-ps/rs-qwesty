@@ -70,7 +70,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
 
         let request_body = CreateAssetRequest {
             name: "new-asset".to_string(),
@@ -97,7 +97,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
 
         let request_body = CreateAssetRequest {
             name: "new-asset".to_string(),
@@ -130,7 +130,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
 
         let request_body = CreateAssetRequest {
             name: "invalid-asset".to_string(),
@@ -163,7 +163,7 @@ mod tests {
             .await;
 
         let server_url = server.url();
-        let url = format!("{}/endpoint", server_url);
+        let url = format!("{server_url}/endpoint");
 
         let response = post_empty(url.as_str()).await;
 
