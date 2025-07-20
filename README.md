@@ -4,8 +4,8 @@ A Rust HTTP client library that provides a simplified wrapper around `reqwest` w
 
 ## Features
 
-- Simple HTTP GET and PUT operations
-- Automatic JSON deserialization using serde
+- Simple HTTP GET operations
+- Two-step response handling (get response, then deserialize)
 - Comprehensive error handling with custom error types
 - Built on top of the reliable `reqwest` crate
 
@@ -38,7 +38,12 @@ struct Asset {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let assets = get::<Assets>("https://api.example.com/assets").await?;
+    // Step 1: Make the HTTP request
+    let response = get("https://api.example.com/assets").await?;
+    
+    // Step 2: Deserialize the response
+    let assets = response.deserialize::<Assets>().await?;
+    
     println!("Fetched {} assets", assets.assets.len());
     Ok(())
 }
@@ -50,7 +55,6 @@ See the `examples/` directory for more detailed usage examples:
 
 - `basic_get.rs` - Simple GET request example
 - `error_handling.rs` - Error handling demonstration
-- `basic_put.rs` - PUT request example
 
 Run examples with:
 ```bash
@@ -64,6 +68,10 @@ The library provides three main error types:
 - `RequestFailed` - HTTP request failures
 - `DeSerError` - JSON deserialization errors
 - `ClientError` - HTTP client creation errors
+
+Errors can occur at two levels:
+1. **Request level** - Network issues, HTTP errors
+2. **Deserialization level** - JSON parsing issues
 
 ## Testing
 
