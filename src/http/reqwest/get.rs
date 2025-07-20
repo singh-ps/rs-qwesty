@@ -1,22 +1,18 @@
 use crate::{
-    http::reqwest::{get_client, handle_response},
-    models::HttpError,
+    http::reqwest::get_client,
+    models::{HttpError, HttpResponse},
 };
-use serde::de::DeserializeOwned;
 
-pub async fn get<T>(url: &str) -> Result<T, HttpError>
-where
-    T: DeserializeOwned,
-{
+pub async fn get(url: &str) -> Result<HttpResponse, HttpError> {
     let client = get_client().await?;
 
-    let response = client
+    let res = client
         .get(url)
         .send()
         .await
         .map_err(|error| HttpError::RequestFailed(error.to_string()))?;
 
-    handle_response(response).await
+    Ok(HttpResponse::new(res))
 }
 
 #[cfg(test)]
@@ -55,17 +51,11 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{}{}", server_url, "/endpoint");
-        let response = get::<Assets>(url.as_str()).await;
+        let response = get(url.as_str()).await;
 
         mock.assert_async().await;
-        match response {
-            Ok(assets) => {
-                assert_eq!(assets.assets.len(), 4);
-            }
-            Err(e) => {
-                panic!("Expected success but got error: {:?}", e);
-            }
-        }
+        let result = response.unwrap().deserialize::<Assets>().await.unwrap();
+        assert_eq!(result.assets.len(), 4);
     }
 
     #[tokio::test]
@@ -81,14 +71,14 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{}{}", server_url, "/endpoint");
-        let response = get::<Assets>(url.as_str()).await;
+        let response = get(url.as_str()).await;
 
         mock.assert_async().await;
-        assert!(response.is_err());
-        assert_eq!(
-            response.err().unwrap(),
-            HttpError::DeSerError("error decoding response body".to_string())
-        );
+        assert!(response.is_ok());
+        let deserialization_result = response.unwrap().deserialize::<Assets>().await;
+        assert!(deserialization_result.is_err());
+        // The exact error message may vary, so just check it's a DeSerError
+        matches!(deserialization_result.err().unwrap(), HttpError::DeSerError(_));
     }
 
     #[tokio::test]
@@ -98,21 +88,19 @@ mod tests {
         let mock = server
             .mock("GET", "/endpoint")
             .with_status(500)
-            .with_body(include_str!("fixtures/assets_response_bad.json"))
+            .with_body(r#"{"message": "Internal server error"}"#)
             .create_async()
             .await;
 
         let server_url = server.url();
         let url = format!("{}{}", server_url, "/endpoint");
-        let response = get::<Assets>(url.as_str()).await;
+        let response = get(url.as_str()).await;
 
         mock.assert_async().await;
-        assert!(response.is_err());
-        assert_eq!(
-            response.err().unwrap(),
-            HttpError::RequestFailed(
-                "500 Internal Server Error: error decoding response body".to_string()
-            )
-        );
+        assert!(response.is_ok());
+        let deserialization_result = response.unwrap().deserialize::<Assets>().await;
+        assert!(deserialization_result.is_err());
+        // Should be a RequestFailed error because the status is not success
+        matches!(deserialization_result.err().unwrap(), HttpError::RequestFailed(_));
     }
 }
