@@ -1,2 +1,2 @@
 mod reqwest;
-pub use reqwest::get::get;
+pub use reqwest::get;

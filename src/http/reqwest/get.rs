@@ -1,14 +1,12 @@
-use crate::models::{ErrorMessage, HttpError};
-use reqwest_middleware::reqwest;
+use crate::http::reqwest::{get_client, handle_response};
+use crate::models::HttpError;
 use serde::de::DeserializeOwned;
 
 pub async fn get<T>(url: &str) -> Result<T, HttpError>
 where
     T: DeserializeOwned,
 {
-    let client = reqwest::ClientBuilder::new()
-        .build()
-        .map_err(|error| HttpError::ClientError(error.to_string()))?;
+    let client = get_client().await?;
 
     let response = client
         .get(url)
@@ -16,24 +14,7 @@ where
         .await
         .map_err(|error| HttpError::RequestFailed(error.to_string()))?;
 
-    if response.status().is_success() {
-        response
-            .json::<T>()
-            .await
-            .map_err(|error| HttpError::DeSerError(error.to_string()))
-    } else {
-        let status = response.status().to_string();
-        let error_message = response
-            .json::<ErrorMessage>()
-            .await
-            .map_err(|error| HttpError::RequestFailed(format!("{}: {}", status, error)))?;
-
-        println!("This wont be reached");
-        Err(HttpError::RequestFailed(format!(
-            "{}: {}",
-            status, error_message.message
-        )))
-    }
+    handle_response(response).await
 }
 
 #[cfg(test)]
@@ -75,8 +56,14 @@ mod tests {
         let response = get::<Assets>(url.as_str()).await;
 
         mock.assert_async().await;
-        assert!(response.is_ok());
-        assert_eq!(response.unwrap().assets.len(), 4);
+        match response {
+            Ok(assets) => {
+                assert_eq!(assets.assets.len(), 4);
+            }
+            Err(e) => {
+                panic!("Expected success but got error: {:?}", e);
+            }
+        }
     }
 
     #[tokio::test]
