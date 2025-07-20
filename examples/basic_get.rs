@@ -3,28 +3,35 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-struct Asset {
+struct HttpBinResponse {
+    args: serde_json::Value,
+    headers: serde_json::Value,
+    origin: String,
     url: String,
-    hash: String,
-    name: String,
-    version: String,
-}
-
-#[derive(Deserialize, Debug)]
-struct Assets {
-    assets: Vec<Asset>,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Making a GET request to fetch assets...");
+    println!("Demonstrating GET request with qwesty...");
 
-    let response = get("https://api.npoint.io/0e304b4f25305b0dd220").await?;
-    let assets = response.deserialize::<Assets>().await?;
+    // httpbin.org/get returns information about the GET request
+    let response = get("https://httpbin.org/get").await?;
 
-    println!("Successfully fetched {} assets:", assets.assets.len());
-    for asset in assets.assets {
-        println!("  - {} (v{}): {}", asset.name, asset.version, asset.url);
+    // Check response details
+    println!("Response status: {}", response.status());
+    println!("Is success: {}", response.is_success());
+
+    if response.is_success() {
+        let data = response.deserialize::<HttpBinResponse>().await?;
+        println!("Successfully made GET request!");
+        println!("Request came from: {}", data.origin);
+        println!("Request URL: {}", data.url);
+        println!(
+            "Headers received: {}",
+            serde_json::to_string_pretty(&data.headers)?
+        );
+    } else {
+        println!("GET request failed with status: {}", response.status());
     }
 
     Ok(())
