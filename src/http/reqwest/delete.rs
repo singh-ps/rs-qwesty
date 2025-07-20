@@ -20,7 +20,7 @@ mod tests {
     use super::delete;
     use crate::models::HttpError;
     use mockito::Server;
-    use serde::{Deserialize, Serialize};
+    use serde::Deserialize;
 
     // Removed the unused DeleteRequest struct as it was not utilized in the code.
 
