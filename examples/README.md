@@ -2,6 +2,8 @@
 
 This directory contains examples demonstrating how to use the qwesty HTTP client library.
 
+All examples use **httpbin.org** as the test API endpoint, which provides reliable and consistent responses for testing HTTP clients. This makes the examples more predictable and easier to understand.
+
 ## Running Examples
 
 You can run any example using:
@@ -13,7 +15,7 @@ cargo run --example <example_name>
 ## Available Examples
 
 ### `basic_get.rs`
-Demonstrates a simple GET request to fetch and display assets. Shows the new `HttpResponse` API where you get a response object first, then call `.deserialize()` to parse the JSON.
+Demonstrates a simple GET request using httpbin.org/get. Shows the new `HttpResponse` API where you get a response object first, then call `.deserialize()` to parse the JSON.
 
 ```bash
 cargo run --example basic_get
@@ -24,6 +26,34 @@ Shows how to handle different types of errors that can occur during HTTP request
 - Successful requests with deserialization
 - Network/connection errors 
 - JSON deserialization errors
+
+### `basic_post.rs`
+Demonstrates a POST request with JSON body using httpbin.org/post. Shows how to send structured data and inspect the response.
+
+```bash
+cargo run --example basic_post
+```
+
+### `basic_post_empty.rs`
+Shows how to make a POST request without a body using httpbin.org/post. Useful for webhooks or ping endpoints.
+
+```bash
+cargo run --example basic_post_empty
+```
+
+### `basic_put.rs`
+Demonstrates a PUT request with JSON body using httpbin.org/put. Shows how to update resources.
+
+```bash
+cargo run --example basic_put
+```
+
+### `basic_delete.rs`
+Shows a simple DELETE request using httpbin.org/delete. Demonstrates resource deletion without a request body.
+
+```bash
+cargo run --example basic_delete
+```
 
 ### `response_inspection.rs`
 Shows how to inspect response details (status code, success flag) before deserializing the JSON.

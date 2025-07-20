@@ -1,37 +1,37 @@
-use qwesty::http::get;
+use qwesty::http::delete;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-struct HttpBinResponse {
+struct HttpBinDeleteResponse {
     args: serde_json::Value,
+    data: String,
+    files: serde_json::Value,
+    form: serde_json::Value,
     headers: serde_json::Value,
+    json: serde_json::Value,
     origin: String,
     url: String,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Demonstrating GET request with qwesty...");
+    println!("Demonstrating DELETE request with qwesty...");
 
-    // httpbin.org/get returns information about the GET request
-    let response = get("https://httpbin.org/get").await?;
+    // Make a DELETE request to httpbin.org/delete
+    let response = delete("https://httpbin.org/delete").await?;
 
     // Check response details
     println!("Response status: {}", response.status());
     println!("Is success: {}", response.is_success());
 
     if response.is_success() {
-        let data = response.deserialize::<HttpBinResponse>().await?;
-        println!("Successfully made GET request!");
+        let data = response.deserialize::<HttpBinDeleteResponse>().await?;
+        println!("Successfully made DELETE request!");
         println!("Request came from: {}", data.origin);
         println!("Request URL: {}", data.url);
-        println!(
-            "Headers received: {}",
-            serde_json::to_string_pretty(&data.headers)?
-        );
     } else {
-        println!("GET request failed with status: {}", response.status());
+        println!("DELETE request failed with status: {}", response.status());
     }
 
     Ok(())
