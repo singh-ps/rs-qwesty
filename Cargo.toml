@@ -2,5 +2,26 @@
 name = "qwesty"
 version = "0.0.1"
 edition = "2021"
+authors = ["Pushpinder Singh <pushpindersingh89@hotmail.com>"]
+keywords = ["http-client", "reqwest-wrapper"]
 
 [dependencies]
+reqwest-middleware = { version = "0.3.3", features = [
+    "json",
+    "multipart",
+    "rustls-tls",
+] }
+reqwest-retry = "0.6.1"
+serde = { version = "1.0.209", features = ["derive"] }
+serde_json = "1.0.127"
+thiserror = "1.0.63"
+tokio = { version = "1.39.3", features = [
+    "rt-multi-thread",
+    "time",
+    "fs",
+    "macros",
+    "net",
+] }
+
+[dev-dependencies]
+mockito = "1.5.0"
