@@ -1,11 +1,10 @@
 use serde::Deserialize;
+use thiserror::Error;
 
 #[derive(Deserialize, Debug)]
 pub struct ErrorMessage {
     pub message: String,
 }
-
-use thiserror::Error;
 
 #[derive(Error, Clone, Debug, serde::Deserialize, PartialEq)]
 pub enum HttpError {
