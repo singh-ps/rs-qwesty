@@ -25,12 +25,12 @@ impl HttpResponse {
 
     async fn json<T: DeserializeOwned>(self) -> Result<T, HttpError> {
         self.response.json().await.map_err(|e| {
-            let mut msg = format!("Error deserializing: {}", e);
+            let mut msg = format!("Error deserializing: {e}");
 
             let mut source = e.source();
             while let Some(err) = source {
                 if let Some(serde_err) = err.downcast_ref::<serde_json::Error>() {
-                    msg.push_str(&format!(": {}", serde_err));
+                    msg.push_str(&format!(": {serde_err}"));
                     break;
                 }
                 source = err.source();
@@ -51,7 +51,7 @@ impl HttpResponse {
                     Err(api_error)
                 }
                 Err(e) => {
-                    let msg = format!("Error deserializing response errors: {}", e);
+                    let msg = format!("Error deserializing response errors: {e}");
                     Err(HttpError::DeSerError(msg))
                 }
             }
