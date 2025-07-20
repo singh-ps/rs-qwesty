@@ -22,7 +22,7 @@ mod tests {
     use mockito::Server;
     use serde::{Deserialize, Serialize};
 
-// Removed the unused DeleteRequest struct as it was not utilized in the code.
+    // Removed the unused DeleteRequest struct as it was not utilized in the code.
 
     #[derive(Deserialize, Debug)]
     #[allow(dead_code)]
