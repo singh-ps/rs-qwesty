@@ -19,8 +19,8 @@ pub async fn put<T: Serialize>(url: &str, body: &T) -> Result<HttpResponse, Http
 
 #[cfg(test)]
 mod tests {
-    use crate::models::HttpError;
     use super::put;
+    use crate::models::HttpError;
     use mockito::Server;
     use serde::{Deserialize, Serialize};
 
@@ -58,12 +58,12 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{}/endpoint", server_url);
-        
+
         let request_body = UpdateAssetRequest {
             name: "test-asset".to_string(),
             version: "1.0.0".to_string(),
         };
-        
+
         let response = put(url.as_str(), &request_body).await;
 
         mock.assert_async().await;
@@ -84,12 +84,12 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{}/endpoint", server_url);
-        
+
         let request_body = UpdateAssetRequest {
             name: "test-asset".to_string(),
             version: "1.0.0".to_string(),
         };
-        
+
         let response = put(url.as_str(), &request_body).await;
 
         mock.assert_async().await;
@@ -116,12 +116,12 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{}/endpoint", server_url);
-        
+
         let request_body = UpdateAssetRequest {
             name: "test-asset".to_string(),
             version: "1.0.0".to_string(),
         };
-        
+
         let response = put(url.as_str(), &request_body).await;
 
         mock.assert_async().await;
