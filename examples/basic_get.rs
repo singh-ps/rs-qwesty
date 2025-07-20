@@ -19,7 +19,8 @@ struct Assets {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Making a GET request to fetch assets...");
 
-    let assets = get::<Assets>("https://api.npoint.io/0e304b4f25305b0dd220").await?;
+    let response = get("https://api.npoint.io/0e304b4f25305b0dd220").await?;
+    let assets = response.deserialize::<Assets>().await?;
 
     println!("Successfully fetched {} assets:", assets.assets.len());
     for asset in assets.assets {
