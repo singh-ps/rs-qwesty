@@ -1,4 +1,4 @@
-# qwesty
+# qwesty ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/singh-ps/rs-qwesty) ![Rust](https://img.shields.io/badge/rust-2021-orange)
 
 A Rust HTTP client library that provides a simplified wrapper around `reqwest` with built-in error handling and JSON deserialization.
 
@@ -17,8 +17,10 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-qwesty = "0.0.1"
+qwesty = { git = "https://github.com/singh-ps/rs-qwesty", tag = "v0.0.1" }
 ```
+
+> Note: Replace the tag with the latest version shown in the badge above.
 
 ## Basic Usage
 
@@ -56,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let response = get("https://httpbin.org/get").await?;
     let data = response.deserialize::<serde_json::Value>().await?;
     println!("GET response: {}", data);
-    
+
     // POST request to create new resource
     let new_data = CreateRequest {
         name: "new-asset".to_string(),
@@ -65,7 +67,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let response = post("https://httpbin.org/post", &new_data).await?;
     let created_data = response.deserialize::<serde_json::Value>().await?;
     println!("POST response: {}", created_data);
-    
+
     // PUT request to update existing resource
     let update_data = UpdateRequest {
         name: "updated-asset".to_string(),
@@ -74,19 +76,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let response = put("https://httpbin.org/put", &update_data).await?;
     let updated_data = response.deserialize::<serde_json::Value>().await?;
     println!("PUT response: {}", updated_data);
-    
+
     // Empty POST request (no body)
     let response = post_empty("https://httpbin.org/post").await?;
     if response.is_success() {
         println!("Empty POST successful!");
     }
-    
+
     // DELETE request to remove a resource
     let response = delete("https://httpbin.org/delete").await?;
     if response.is_success() {
         println!("DELETE request successful");
     }
-    
+
     Ok(())
 }
 ```
@@ -104,6 +106,7 @@ See the `examples/` directory for more detailed usage examples:
 - `response_inspection.rs` - Response inspection before deserialization
 
 Run examples with:
+
 ```bash
 cargo run --example basic_get
 ```
@@ -117,12 +120,14 @@ The library provides three main error types:
 - `ClientError` - HTTP client creation errors
 
 Errors can occur at two levels:
+
 1. **Request level** - Network issues, HTTP errors
 2. **Deserialization level** - JSON parsing issues
 
 ## Testing
 
 Run tests with:
+
 ```bash
 cargo test
 ```
