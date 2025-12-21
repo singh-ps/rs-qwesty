@@ -8,7 +8,6 @@ pub struct RetryPolicy {
     pub retries: u32,
     pub min_interval: Duration,
     pub max_interval: Duration,
-    pub backoff_exp: u32,
 }
 
 impl Default for RetryPolicy {
@@ -17,7 +16,6 @@ impl Default for RetryPolicy {
             retries: 0,
             min_interval: Duration::from_secs(1),
             max_interval: Duration::from_secs(60 * 60),
-            backoff_exp: 0,
         }
     }
 }
