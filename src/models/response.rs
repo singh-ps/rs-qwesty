@@ -1,8 +1,7 @@
-use std::error::Error;
-
 use crate::models::{ErrorMessage, HttpError};
 use reqwest_middleware::reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
+use std::error::Error;
 
 /// Represents an HTTP response.
 /// This struct wraps the `reqwest::Response` and provides methods to access the response data.
@@ -44,16 +43,21 @@ impl HttpResponse {
         if self.is_success() {
             Ok(self.json().await?)
         } else {
-            let err_response_res: Result<ErrorMessage, HttpError> = self.json().await;
-            match err_response_res {
-                Ok(error_response) => {
-                    let api_error = HttpError::RequestFailed(error_response.message);
-                    Err(api_error)
-                }
-                Err(e) => {
-                    let msg = format!("Error deserializing response errors: {e}");
-                    Err(HttpError::DeSerError(msg))
-                }
+            let status = self.status();
+            // Failure case: Capture body as text to provide better error context
+            let body_text = self.response.text().await.map_err(|e| {
+                HttpError::RequestFailed(format!("Status {}: (Body unreadable: {})", status, e))
+            })?;
+
+            // 1. Try to parse as our standard ErrorMessage JSON
+            if let Ok(error_message) = serde_json::from_str::<ErrorMessage>(&body_text) {
+                Err(HttpError::RequestFailed(error_message.message))
+            } else {
+                // 2. Fallback: Return the raw text body (useful for 404 HTML, 502 Bad Gateway, etc.)
+                Err(HttpError::RequestFailed(format!(
+                    "Status {}: {}",
+                    status, body_text
+                )))
             }
         }
     }
