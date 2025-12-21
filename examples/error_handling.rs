@@ -31,6 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(HttpError::RequestFailed(msg)) => println!("❌ Request failed: {}", msg),
         Err(HttpError::DeSerError(msg)) => println!("❌ Deserialization failed: {}", msg),
         Err(HttpError::ClientError(msg)) => println!("❌ Client error: {}", msg),
+        _ => println!("❌ Unknown error"),
     }
 
     // This will fail (invalid JSON structure for User)
@@ -40,6 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Err(HttpError::RequestFailed(msg)) => println!("❌ Request failed: {}", msg),
             Err(HttpError::DeSerError(msg)) => println!("❌ Deserialization failed: {}", msg),
             Err(HttpError::ClientError(msg)) => println!("❌ Client error: {}", msg),
+            _ => println!("❌ Unknown error"),
         },
         Err(e) => println!("❌ Error making request: {:?}", e),
     }

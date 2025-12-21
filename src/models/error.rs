@@ -14,4 +14,6 @@ pub enum HttpError {
     DeSerError(String),
     #[error("Unable to create client: `{0}`")]
     ClientError(String),
+    #[error("Header error: `{0}`")]
+    HeaderError(String),
 }

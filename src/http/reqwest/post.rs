@@ -5,7 +5,7 @@ use crate::{
 use serde::Serialize;
 
 pub async fn post<T: Serialize>(url: &str, body: &T) -> Result<HttpResponse, HttpError> {
-    let client = get_client().await?;
+    let client = get_client()?;
 
     let res = client
         .post(url)
@@ -18,7 +18,7 @@ pub async fn post<T: Serialize>(url: &str, body: &T) -> Result<HttpResponse, Htt
 }
 
 pub async fn post_empty(url: &str) -> Result<HttpResponse, HttpError> {
-    let client = get_client().await?;
+    let client = get_client()?;
 
     let res = client
         .post(url)

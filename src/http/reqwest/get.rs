@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub async fn get(url: &str) -> Result<HttpResponse, HttpError> {
-    let client = get_client().await?;
+    let client = get_client()?;
 
     let res = client
         .get(url)
