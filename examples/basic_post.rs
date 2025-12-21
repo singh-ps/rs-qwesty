@@ -34,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Make the POST request to httpbin.org/post
-    let response = post("https://httpbin.org/post", &new_user).await?;
+    let response = post("https://httpbin.org/post", None, &new_user).await?;
 
     // Check response details
     println!("Response status: {}", response.status());

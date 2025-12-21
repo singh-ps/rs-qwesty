@@ -19,7 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Demonstrating DELETE request with qwesty...");
 
     // Make a DELETE request to httpbin.org/delete
-    let response = delete("https://httpbin.org/delete").await?;
+    let response = delete("https://httpbin.org/delete", None).await?;
 
     // Check response details
     println!("Response status: {}", response.status());

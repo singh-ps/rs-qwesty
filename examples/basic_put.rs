@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Make the PUT request to httpbin.org/put
-    let response = put("https://httpbin.org/put", &update_request).await?;
+    let response = put("https://httpbin.org/put", None, &update_request).await?;
 
     // Check response details
     println!("Response status: {}", response.status());

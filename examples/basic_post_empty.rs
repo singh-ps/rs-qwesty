@@ -19,7 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Demonstrating empty POST request with qwesty...");
 
     // Make an empty POST request (no body)
-    let response = post_empty("https://httpbin.org/post").await?;
+    let response = post_empty("https://httpbin.org/post", None).await?;
 
     // Check response details
     println!("Response status: {}", response.status());

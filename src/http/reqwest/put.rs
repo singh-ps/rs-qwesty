@@ -1,11 +1,15 @@
 use crate::{
-    http::reqwest::get_client,
+    http::{reqwest::get_client, ConfiguredClient},
     models::{HttpError, HttpResponse},
 };
 use serde::Serialize;
 
-pub async fn put<T: Serialize>(url: &str, body: &T) -> Result<HttpResponse, HttpError> {
-    let client = get_client()?;
+pub async fn put<T: Serialize>(
+    url: &str,
+    configured_client: Option<ConfiguredClient>,
+    body: &T,
+) -> Result<HttpResponse, HttpError> {
+    let client = get_client(configured_client)?;
 
     let res = client
         .put(url)
@@ -64,7 +68,7 @@ mod tests {
             version: "1.0.0".to_string(),
         };
 
-        let response = put(url.as_str(), &request_body).await;
+        let response = put(url.as_str(), None, &request_body).await;
 
         mock.assert_async().await;
         let result = response.unwrap().deserialize::<Assets>().await.unwrap();
@@ -90,7 +94,7 @@ mod tests {
             version: "1.0.0".to_string(),
         };
 
-        let response = put(url.as_str(), &request_body).await;
+        let response = put(url.as_str(), None, &request_body).await;
 
         mock.assert_async().await;
         assert!(response.is_ok());
@@ -122,7 +126,7 @@ mod tests {
             version: "1.0.0".to_string(),
         };
 
-        let response = put(url.as_str(), &request_body).await;
+        let response = put(url.as_str(), None, &request_body).await;
 
         mock.assert_async().await;
         assert!(response.is_ok());

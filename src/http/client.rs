@@ -4,11 +4,11 @@ use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 use std::time::Duration;
 
 #[derive(Clone, Debug)]
-pub struct Client {
-    pub inner: ClientWithMiddleware,
+pub struct ConfiguredClient {
+    pub client: ClientWithMiddleware,
 }
 
-impl Client {
+impl ConfiguredClient {
     /// Create a new `Client` with a `ClientConfig`
     pub fn try_new(config: &ClientConfig) -> Result<Self, HttpError> {
         let mut client_builder = reqwest::ClientBuilder::new();
@@ -22,14 +22,14 @@ impl Client {
 
         let mut retry_policy =
             ExponentialBackoff::builder().build_with_max_retries(config.retry_policy.retries);
-        retry_policy.max_retry_interval = config.retry_policy.min_interval;
-        retry_policy.min_retry_interval = config.retry_policy.max_interval;
+        retry_policy.min_retry_interval = config.retry_policy.min_interval;
+        retry_policy.max_retry_interval = config.retry_policy.max_interval;
 
         let retry_client = ClientBuilder::new(client.clone())
             .with(RetryTransientMiddleware::new_with_policy(retry_policy))
             .build();
         Ok(Self {
-            inner: retry_client,
+            client: retry_client,
         })
     }
 }

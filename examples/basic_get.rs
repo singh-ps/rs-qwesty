@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Demonstrating GET request with qwesty...");
 
     // httpbin.org/get returns information about the GET request
-    let response = get("https://httpbin.org/get").await?;
+    let response = get("https://httpbin.org/get", None).await?;
 
     // Check response details
     println!("Response status: {}", response.status());

@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Demonstrating error handling with qwesty...");
 
     // This will succeed (JSONPlaceholder API)
-    match qwesty::http::get("https://jsonplaceholder.typicode.com/users/1").await {
+    match qwesty::http::get("https://jsonplaceholder.typicode.com/users/1", None).await {
         Ok(response) => match response.deserialize::<User>().await {
             Ok(user) => println!("✅ Successfully fetched user: {:?}", user),
             Err(e) => println!("❌ Error deserializing user: {:?}", e),
@@ -23,7 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // This will fail (invalid URL)
-    match qwesty::http::get("https://invalid-url-that-doesnt-exist.com/user").await {
+    match qwesty::http::get("https://invalid-url-that-doesnt-exist.com/user", None).await {
         Ok(response) => match response.deserialize::<User>().await {
             Ok(user) => println!("✅ Successfully fetched user: {:?}", user),
             Err(e) => println!("❌ Error deserializing: {:?}", e),
@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // This will fail (invalid JSON structure for User)
-    match qwesty::http::get("https://httpbin.org/json").await {
+    match qwesty::http::get("https://httpbin.org/json", None).await {
         Ok(response) => match response.deserialize::<User>().await {
             Ok(user) => println!("✅ Successfully fetched user: {:?}", user),
             Err(HttpError::RequestFailed(msg)) => println!("❌ Request failed: {}", msg),

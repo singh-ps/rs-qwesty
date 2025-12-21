@@ -1,10 +1,13 @@
 use crate::{
-    http::reqwest::get_client,
+    http::{reqwest::get_client, ConfiguredClient},
     models::{HttpError, HttpResponse},
 };
 
-pub async fn delete(url: &str) -> Result<HttpResponse, HttpError> {
-    let client = get_client()?;
+pub async fn delete(
+    url: &str,
+    configured_client: Option<ConfiguredClient>,
+) -> Result<HttpResponse, HttpError> {
+    let client = get_client(configured_client)?;
 
     let res = client
         .delete(url)
@@ -45,7 +48,7 @@ mod tests {
         let server_url = server.url();
         let url = format!("{server_url}/endpoint/1");
 
-        let response = delete(url.as_str()).await;
+        let response = delete(url.as_str(), None).await;
 
         mock.assert_async().await;
         let result = response
@@ -71,7 +74,7 @@ mod tests {
         let server_url = server.url();
         let url = format!("{server_url}/endpoint/999");
 
-        let response = delete(url.as_str()).await;
+        let response = delete(url.as_str(), None).await;
 
         mock.assert_async().await;
         assert!(response.is_ok());

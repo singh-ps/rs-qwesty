@@ -1,11 +1,15 @@
 use crate::{
-    http::reqwest::get_client,
+    http::{reqwest::get_client, ConfiguredClient},
     models::{HttpError, HttpResponse},
 };
 use serde::Serialize;
 
-pub async fn post<T: Serialize>(url: &str, body: &T) -> Result<HttpResponse, HttpError> {
-    let client = get_client()?;
+pub async fn post<T: Serialize>(
+    url: &str,
+    configured_client: Option<ConfiguredClient>,
+    body: &T,
+) -> Result<HttpResponse, HttpError> {
+    let client = get_client(configured_client)?;
 
     let res = client
         .post(url)
@@ -17,8 +21,11 @@ pub async fn post<T: Serialize>(url: &str, body: &T) -> Result<HttpResponse, Htt
     Ok(HttpResponse::new(res))
 }
 
-pub async fn post_empty(url: &str) -> Result<HttpResponse, HttpError> {
-    let client = get_client()?;
+pub async fn post_empty(
+    url: &str,
+    configured_client: Option<ConfiguredClient>,
+) -> Result<HttpResponse, HttpError> {
+    let client = get_client(configured_client)?;
 
     let res = client
         .post(url)
@@ -78,7 +85,7 @@ mod tests {
             url: "https://example.com/asset".to_string(),
         };
 
-        let response = post(url.as_str(), &request_body).await;
+        let response = post(url.as_str(), None, &request_body).await;
 
         mock.assert_async().await;
         let result = response.unwrap().deserialize::<Assets>().await.unwrap();
@@ -105,7 +112,7 @@ mod tests {
             url: "https://example.com/asset".to_string(),
         };
 
-        let response = post(url.as_str(), &request_body).await;
+        let response = post(url.as_str(), None, &request_body).await;
 
         mock.assert_async().await;
         assert!(response.is_ok());
@@ -138,7 +145,7 @@ mod tests {
             url: "https://example.com/asset".to_string(),
         };
 
-        let response = post(url.as_str(), &request_body).await;
+        let response = post(url.as_str(), None, &request_body).await;
 
         mock.assert_async().await;
         assert!(response.is_ok());
@@ -165,7 +172,7 @@ mod tests {
         let server_url = server.url();
         let url = format!("{server_url}/endpoint");
 
-        let response = post_empty(url.as_str()).await;
+        let response = post_empty(url.as_str(), None).await;
 
         mock.assert_async().await;
         let result = response.unwrap().deserialize::<Assets>().await.unwrap();
