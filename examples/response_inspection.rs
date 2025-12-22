@@ -13,7 +13,7 @@ struct User {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Demonstrating HttpResponse methods...");
 
-    let response = get("https://jsonplaceholder.typicode.com/users/1").await?;
+    let response = get("https://jsonplaceholder.typicode.com/users/1", None).await?;
 
     // Check response details before deserializing
     println!("Response status: {}", response.status());

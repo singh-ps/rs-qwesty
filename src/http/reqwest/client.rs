@@ -1,8 +1,19 @@
-use crate::models::HttpError;
-use reqwest_middleware::reqwest::{Client, ClientBuilder};
+use crate::{
+    http::ConfiguredClient,
+    models::{ClientConfig, HttpError},
+};
+use reqwest_middleware::ClientWithMiddleware;
 
-pub async fn get_client() -> Result<Client, HttpError> {
-    ClientBuilder::new()
-        .build()
-        .map_err(|error| HttpError::ClientError(error.to_string()))
+/// Creates a new Client with middleware if configured client is None
+pub fn get_client(
+    configured_client: Option<ConfiguredClient>,
+) -> Result<ClientWithMiddleware, HttpError> {
+    match configured_client {
+        Some(config_client) => Ok(config_client.client),
+
+        None => {
+            let config_client = ConfiguredClient::try_new(&ClientConfig::default())?;
+            Ok(config_client.client)
+        }
+    }
 }

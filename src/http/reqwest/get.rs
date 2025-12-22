@@ -1,10 +1,13 @@
 use crate::{
-    http::reqwest::get_client,
+    http::{reqwest::get_client, ConfiguredClient},
     models::{HttpError, HttpResponse},
 };
 
-pub async fn get(url: &str) -> Result<HttpResponse, HttpError> {
-    let client = get_client().await?;
+pub async fn get(
+    url: &str,
+    configured_client: Option<ConfiguredClient>,
+) -> Result<HttpResponse, HttpError> {
+    let client = get_client(configured_client)?;
 
     let res = client
         .get(url)
@@ -51,7 +54,7 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{server_url}/endpoint");
-        let response = get(url.as_str()).await;
+        let response = get(url.as_str(), None).await;
 
         mock.assert_async().await;
         let result = response.unwrap().deserialize::<Assets>().await.unwrap();
@@ -71,7 +74,7 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{server_url}/endpoint");
-        let response = get(url.as_str()).await;
+        let response = get(url.as_str(), None).await;
 
         mock.assert_async().await;
         assert!(response.is_ok());
@@ -97,7 +100,7 @@ mod tests {
 
         let server_url = server.url();
         let url = format!("{server_url}/endpoint");
-        let response = get(url.as_str()).await;
+        let response = get(url.as_str(), None).await;
 
         mock.assert_async().await;
         assert!(response.is_ok());
