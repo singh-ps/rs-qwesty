@@ -47,9 +47,7 @@ impl ClientConfig {
         mut headers: Headers,
         opt_retry_policy: Option<RetryPolicy>,
     ) -> Self {
-        if !headers.has_user_agent() {
-            headers.add_user_agent(&user_agent);
-        }
+        headers.add_user_agent(&user_agent);
         Self {
             timeout,
             user_agent,

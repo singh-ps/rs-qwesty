@@ -33,3 +33,65 @@ impl ConfiguredClient {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::http::get;
+    use crate::models::{Headers, RetryPolicy};
+    use mockito::Server;
+    use std::time::Duration;
+
+    #[tokio::test]
+    async fn test_configured_client_custom_user_agent() {
+        let mut server = Server::new_async().await;
+        let custom_ua = "Custom-UA-123";
+
+        let mock = server
+            .mock("GET", "/test")
+            .match_header("user-agent", custom_ua)
+            .with_status(200)
+            .create_async()
+            .await;
+
+        let config = ClientConfig::new(30, custom_ua.to_string(), Headers::default(), None);
+        let client = ConfiguredClient::try_new(&config).unwrap();
+
+        let url = format!("{}/test", server.url());
+        let _ = get(&url, Some(client)).await;
+
+        mock.assert_async().await;
+    }
+
+    #[tokio::test]
+    async fn test_configured_client_retries() {
+        let mut server = Server::new_async().await;
+
+        // Mock will expect exactly 3 requests (1 initial + 2 retries)
+        let mock = server
+            .mock("GET", "/retry")
+            .with_status(500)
+            .expect(3)
+            .create_async()
+            .await;
+
+        let retry_policy = RetryPolicy {
+            retries: 2,
+            min_interval: Duration::from_millis(10),
+            max_interval: Duration::from_millis(100),
+        };
+
+        let config = ClientConfig::new(
+            30,
+            "test-agent".to_string(),
+            Headers::default(),
+            Some(retry_policy),
+        );
+        let client = ConfiguredClient::try_new(&config).unwrap();
+
+        let url = format!("{}/retry", server.url());
+        let _ = get(&url, Some(client)).await;
+
+        mock.assert_async().await;
+    }
+}
