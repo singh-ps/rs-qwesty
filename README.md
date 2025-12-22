@@ -1,15 +1,17 @@
 # qwesty ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/singh-ps/rs-qwesty) ![Rust](https://img.shields.io/badge/rust-2021-orange)
 
-A Rust HTTP client library that provides a simplified wrapper around `reqwest` with built-in error handling and JSON deserialization.
+A Rust HTTP client library that provides a simplified wrapper around `reqwest` with built-in error handling, JSON deserialization, and automatic retries.
 
 ## Features
 
 - Simple HTTP GET, POST, PUT, and DELETE operations
-- Empty POST requests (no body)
-- Two-step response handling (get response, then deserialize)
-- JSON request bodies for POST and PUT operations
-- Comprehensive error handling with custom error types
-- Built on top of the reliable `reqwest` crate
+- **Configurable Client**: Custom timeouts, headers, and User-Agents.
+- **Resilience**: Automatic retries with exponential backoff for transient failures.
+- Empty POST requests (no body).
+- Two-step response handling (get response, then deserialize).
+- JSON request bodies for POST and PUT operations.
+- Comprehensive error handling with custom error types.
+- Built on top of the reliable `reqwest` and `reqwest-middleware` crates.
 
 ## Quick Start
 
@@ -17,77 +19,65 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-qwesty = { git = "https://github.com/singh-ps/rs-qwesty", tag = "v0.0.1" }
+qwesty = { git = "https://github.com/singh-ps/rs-qwesty", tag = "v0.1.0" }
 ```
 
 > Note: Replace the tag with the latest version shown in the badge above.
 
 ## Basic Usage
 
+For simple requests, you can pass `None` as the second argument to use the library's default configuration (60s timeout, default User-Agent, and no retries).
+
 ```rust
 use qwesty::http::{get, post, post_empty, put, delete};
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
-struct Assets {
-    assets: Vec<Asset>,
-}
-
-#[derive(Deserialize)]
-struct Asset {
-    name: String,
-    version: String,
-    // ... other fields
-}
-
-#[derive(Serialize)]
-struct CreateRequest {
-    name: String,
-    version: String,
-}
-
-#[derive(Serialize)]
-struct UpdateRequest {
-    name: String,
-    version: String,
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // GET request
-    let response = get("https://httpbin.org/get").await?;
+    // GET request with default client
+    let response = get("https://httpbin.org/get", None).await?;
     let data = response.deserialize::<serde_json::Value>().await?;
     println!("GET response: {}", data);
 
-    // POST request to create new resource
-    let new_data = CreateRequest {
-        name: "new-asset".to_string(),
-        version: "1.0.0".to_string(),
+    // POST request with default client
+    let new_data = serde_json::json!({"name": "new-asset"});
+    let response = post("https://httpbin.org/post", None, &new_data).await?;
+
+    Ok(())
+}
+```
+
+## Advanced Usage: Configuration & Retries
+
+You can create a `ConfiguredClient` to customize behavior and enable automatic retries for transient errors (like 500 or 503 status codes).
+
+```rust
+use qwesty::http::{get, ConfiguredClient};
+use qwesty::models::{ClientConfig, RetryPolicy, Headers};
+use std::time::Duration;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // 1. Define a Retry Policy (e.g., retry 3 times)
+    let retry_policy = RetryPolicy {
+        retries: 3,
+        min_interval: Duration::from_millis(100),
+        max_interval: Duration::from_secs(2),
     };
-    let response = post("https://httpbin.org/post", &new_data).await?;
-    let created_data = response.deserialize::<serde_json::Value>().await?;
-    println!("POST response: {}", created_data);
 
-    // PUT request to update existing resource
-    let update_data = UpdateRequest {
-        name: "updated-asset".to_string(),
-        version: "2.0.0".to_string(),
-    };
-    let response = put("https://httpbin.org/put", &update_data).await?;
-    let updated_data = response.deserialize::<serde_json::Value>().await?;
-    println!("PUT response: {}", updated_data);
+    // 2. Create a Configuration
+    let config = ClientConfig::new(
+        30,                                // Timeout in seconds
+        "My-Custom-App/1.0".to_string(),   // Custom User Agent
+        Headers::default(),                // Headers
+        Some(retry_policy),
+    );
 
-    // Empty POST request (no body)
-    let response = post_empty("https://httpbin.org/post").await?;
-    if response.is_success() {
-        println!("Empty POST successful!");
-    }
+    // 3. Initialize the Client
+    let client = ConfiguredClient::try_new(&config)?;
 
-    // DELETE request to remove a resource
-    let response = delete("https://httpbin.org/delete").await?;
-    if response.is_success() {
-        println!("DELETE request successful");
-    }
+    // 4. Use the client for multiple requests
+    let response = get("https://httpbin.org/get", Some(client.clone())).await?;
 
     Ok(())
 }
@@ -113,16 +103,12 @@ cargo run --example basic_get
 
 ## Error Handling
 
-The library provides three main error types:
+The library provides four main error types:
 
-- `RequestFailed` - HTTP request failures
+- `RequestFailed` - HTTP request failures (includes status code and body context)
 - `DeSerError` - JSON deserialization errors
 - `ClientError` - HTTP client creation errors
-
-Errors can occur at two levels:
-
-1. **Request level** - Network issues, HTTP errors
-2. **Deserialization level** - JSON parsing issues
+- `HeaderError` - Error parsing or setting HTTP headers
 
 ## Testing
 
